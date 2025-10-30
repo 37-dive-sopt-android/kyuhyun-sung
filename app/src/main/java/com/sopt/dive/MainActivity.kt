@@ -67,10 +67,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // LoginActivity에서 받은 데이터
-        val userId = intent.getStringExtra("userId") ?: ""
-        val userNickname = intent.getStringExtra("userNickname") ?: ""
-        val userExtra = intent.getStringExtra("userExtra") ?: ""
-        val userPw = intent.getStringExtra("userPw") ?: ""
+        val userId = intent.getStringExtra(IntentKeys.USER_ID) ?: ""
+        val userNickname = intent.getStringExtra(IntentKeys.USER_NICKNAME) ?: ""
+        val userExtra = intent.getStringExtra(IntentKeys.USER_EXTRA) ?: ""
+        val userPw = intent.getStringExtra(IntentKeys.USER_PW) ?: ""
 
 
         enableEdgeToEdge()
@@ -194,38 +194,8 @@ fun MainScreen(
     }
 }
 
-
-
-// 처음 짯던 코드
-//@Preview(showBackground = true)
-//@Composable
-//fun TestPreview()
-//{
-//    LoginScreen()
-//    SignUpScreen()
-//    MainScreen()
-//}
-
-
 @Preview(showBackground = true, name = "Main Screen")
 @Composable
 fun MainScreenPreview() {
     //MainScreen()
 }
-
-
-//// Column이나 Row로 배치 Preview 배치
-//@Preview(showBackground = true)
-//@Composable
-//fun MultiScreenPreview() {
-//    Column {
-//        LoginScreen()
-//        HorizontalDivider()
-//        // 앱에 구분선을 구현
-//        SignUpScreen()
-//        HorizontalDivider()
-//        MainScreen()
-//    }
-//}
-
-// 코드길어지니까 유사XML되가는듯 개꼴보기싫네

@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sopt.dive.IntentKeys
 
 class SignUpActivity : ComponentActivity() {
 
@@ -65,10 +66,10 @@ class SignUpActivity : ComponentActivity() {
             else -> {
                 // 회원가입 성공 - 데이터 반환
                 val resultIntent = Intent().apply {
-                    putExtra("userId", id)
-                    putExtra("userPw", pw)
-                    putExtra("userNickname", nickname)
-                    putExtra("userExtra", extra)
+                    putExtra(IntentKeys.USER_ID, id)
+                    putExtra(IntentKeys.USER_PW, pw)
+                    putExtra(IntentKeys.USER_NICKNAME, nickname)
+                    putExtra(IntentKeys.USER_EXTRA, extra)
                 }
                 setResult(RESULT_OK, resultIntent)
                 finish()

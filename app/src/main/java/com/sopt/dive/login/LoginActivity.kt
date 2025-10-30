@@ -1,5 +1,6 @@
 package com.sopt.dive.login
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -47,20 +48,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sopt.dive.IntentKeys
 import com.sopt.dive.MainActivity
 import com.sopt.dive.signup.SignUpActivity
 
 class LoginActivity : ComponentActivity() {
 
-    // SharedPreferences 이름 정의
-    companion object {
-        private const val PREFS_NAME = "sopt_prefs"
-        private const val KEY_IS_LOGGED_IN = "is_logged_in"
-        private const val KEY_USER_ID = "user_id"
-        private const val KEY_USER_PW = "user_pw"
-        private const val KEY_USER_NICKNAME = "user_nickname"
-        private const val KEY_USER_EXTRA = "user_extra"
-    }
 
     // 회원가입 결과를 받을 launcher
     private val signUpLauncher = registerForActivityResult(
@@ -68,10 +61,12 @@ class LoginActivity : ComponentActivity() {
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             // 회원가입에서 받은 데이터
-            savedId = result.data?.getStringExtra("userId") ?: ""
-            savedPw = result.data?.getStringExtra("userPw") ?: ""
-            savedNickname = result.data?.getStringExtra("userNickname") ?: ""
-            savedExtra = result.data?.getStringExtra("userExtra") ?: ""
+
+            // IntentKey -> 문자열 상수교체
+            savedId = result.data?.getStringExtra(IntentKeys.USER_ID) ?: ""
+            savedPw = result.data?.getStringExtra(IntentKeys.USER_PW) ?: ""
+            savedNickname = result.data?.getStringExtra(IntentKeys.USER_NICKNAME) ?: ""
+            savedExtra = result.data?.getStringExtra(IntentKeys.USER_EXTRA) ?: ""
 
             Toast.makeText(this, "회원가입 성공!", Toast.LENGTH_SHORT).show()
         }
@@ -110,16 +105,17 @@ class LoginActivity : ComponentActivity() {
 
             // 저장된 데이터로 MainActivity 이동
             val intent = Intent(this, MainActivity::class.java).apply {
-                putExtra("userId", userId)
-                putExtra("userNickname", userNickname)
-                putExtra("userExtra", userExtra)
-                putExtra("userPw", userPw)
+                putExtra(IntentKeys.USER_ID, userId)
+                putExtra(IntentKeys.USER_NICKNAME, userNickname)
+                putExtra(IntentKeys.USER_EXTRA, userExtra)
+                putExtra(IntentKeys.USER_PW, userPw)
             }
             startActivity(intent)
             finish() // 현재 액티비티 종료
         }
     }
 
+    @SuppressLint("CommitPrefEdits")
     private fun handleLogin(id: String, pw: String) {
         if (id == savedId && pw == savedPw) {
             // 로그인 성공 - SharedPreferences에 저장
@@ -130,16 +126,15 @@ class LoginActivity : ComponentActivity() {
                 putString(KEY_USER_PW, savedPw)
                 putString(KEY_USER_NICKNAME, savedNickname)
                 putString(KEY_USER_EXTRA, savedExtra)
-                apply()
             }
 
             Toast.makeText(this, "로그인에 성공했습니다", Toast.LENGTH_SHORT).show()
 
             val intent = Intent(this, MainActivity::class.java).apply {
-                putExtra("userId", savedId)
-                putExtra("userNickname", savedNickname)
-                putExtra("userExtra", savedExtra)
-                putExtra("userPw", savedPw)
+                putExtra(IntentKeys.USER_ID, savedId)
+                putExtra(IntentKeys.USER_NICKNAME, savedNickname)
+                putExtra(IntentKeys.USER_EXTRA, savedExtra)
+                putExtra(IntentKeys.USER_PW, savedPw)
             }
             startActivity(intent)
             finish() // 뒤로가기 방지
@@ -152,7 +147,18 @@ class LoginActivity : ComponentActivity() {
         val intent = Intent(this, SignUpActivity::class.java)
         signUpLauncher.launch(intent)
     }
+
+    companion object {
+        private const val PREFS_NAME = "sopt_prefs"
+        private const val KEY_IS_LOGGED_IN = "is_logged_in"
+        private const val KEY_USER_ID = "user_id"
+        private const val KEY_USER_PW = "user_pw"
+        private const val KEY_USER_NICKNAME = "user_nickname"
+        private const val KEY_USER_EXTRA = "user_extra"
+    }
 }
+
+
 
 // 로그인 페이지
 @Composable
@@ -280,4 +286,5 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
     }
+
 }
