@@ -1,5 +1,6 @@
 package com.sopt.dive.feature.login
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -37,9 +38,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sopt.dive.core.data.UserPreferences
 import com.sopt.dive.core.ui.noRippleClickable
 
-// 로그인 화면 컴포저블
+/**
+ * 로그인 화면
+ *
+ * 사용자로부터 ID와 비밀번호를 입력받아 SharedPreferences에 저장된 정보와 비교
+ * 일치하면 로그인 성공, 일치하지 않으면 에러 메시지를 표시
+ */
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
@@ -47,25 +54,21 @@ fun LoginScreen(
     onSignUpClick: () -> Unit
 ) {
     val context = LocalContext.current
+    val userPreferences = UserPreferences.getInstance(context)
 
-    // 사용자가 입력한 ID와 PW를 저장하는 상태 변수
     var idText by remember { mutableStateOf("") }
     var pwText by remember { mutableStateOf("") }
 
-    // 키보드에서 "다음" 버튼을 눌렀을 때 비밀번호 입력으로 포커스를 이동시키기 위한 객체
     val focusRequester = remember { FocusRequester() }
-
-    // 키보드가 올라와도 화면을 스크롤할 수 있도록 하는 상태
     val scrollState = rememberScrollState()
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .imePadding()  // 키보드가 올라올 때 자동으로 패딩 추가
+            .imePadding()
             .padding(horizontal = 24.dp)
     ) {
-        // 상단 타이틀
         Text(
             text = "Welcome To Sopt",
             modifier = Modifier
@@ -76,17 +79,14 @@ fun LoginScreen(
             fontWeight = FontWeight.Bold,
         )
 
-        // ID 입력 라벨
         Text(text = "ID", fontSize = 20.sp)
 
-        // 무지개 텍스트 스타일
         val brush = remember {
             Brush.linearGradient(
                 colors = listOf(Color.Red, Color.Yellow, Color.Green, Color.Blue, Color.Magenta)
             )
         }
 
-        // ID 입력 필드
         OutlinedTextField(
             value = idText,
             onValueChange = { idText = it },
@@ -98,46 +98,60 @@ fun LoginScreen(
             ),
             keyboardActions = KeyboardActions(
                 onNext = {
-                    focusRequester.requestFocus() // "다음" 버튼으로 비밀번호 입력으로 이동
+                    focusRequester.requestFocus()
                 }
             ),
-            // singleLine = true는 두 가지 효과: 1) 한 줄 제한, 2) 엔터 키를 IME 액션으로 변경
-            // maxLines = 1과 달리 키보드 동작이 변경되므로 로그인 필드에 적합
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // PW 입력 라벨
         Text(text = "PW", fontSize = 20.sp)
 
-        // PW 입력 필드
         OutlinedTextField(
             value = pwText,
             onValueChange = { pwText = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .focusRequester(focusRequester), // ID 입력에서 "다음"을 누르면 포커스가 여기로 이동
+                .focusRequester(focusRequester),
             textStyle = TextStyle(brush = brush),
             label = { Text("비밀번호를 입력해주세요.") },
             singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),  // 비밀번호 마스킹 처리
+            visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Go
             ),
             keyboardActions = KeyboardActions(
                 onGo = {
-                    onLoginClick(idText, pwText) // "완료" 버튼으로 로그인 실행
+                    // 로그인 검증 로직을 여기에 추가
+                    if (userPreferences.validateLogin(idText, pwText)) {
+                        onLoginClick(idText, pwText)
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "ID 또는 비밀번호가 일치하지 않습니다",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             )
         )
 
-        // 중간 공간을 채워서 하단 요소들을 아래로 밀어냄
         Spacer(modifier = Modifier.weight(1f))
 
-        // 로그인 버튼
         Button(
-            onClick = { onLoginClick(idText, pwText) },
+            onClick = {
+                // 로그인 버튼 클릭 시 검증
+                if (userPreferences.validateLogin(idText, pwText)) {
+                    onLoginClick(idText, pwText)
+                } else {
+                    Toast.makeText(
+                        context,
+                        "ID 또는 비밀번호가 일치하지 않습니다",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
             shape = RoundedCornerShape(8.dp)
@@ -147,8 +161,6 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 회원가입 버튼
-        // noRippleClickable 확장 함수를 사용하여 리플 효과 제거
         Box(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)

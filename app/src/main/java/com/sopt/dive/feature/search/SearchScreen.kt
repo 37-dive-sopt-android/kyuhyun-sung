@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -25,9 +26,16 @@ fun SearchScreen(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "Search Screen",
+            text = "Search 화면입니다 !!",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
     }
+}
+
+// Preview 함수는 UI 확인용으로만 사용되므로 private으로 선언
+@Preview(showBackground = true, name = "Search Screen")
+@Composable
+private fun SearchPreview() {
+    SearchScreen()
 }

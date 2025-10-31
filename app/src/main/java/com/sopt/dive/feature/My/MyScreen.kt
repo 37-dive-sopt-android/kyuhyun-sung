@@ -1,4 +1,4 @@
-package com.sopt.dive.feature.main
+package com.sopt.dive.feature.My
 
 
 import androidx.compose.foundation.background
@@ -26,13 +26,13 @@ import coil.decode.GifDecoder
 
 /**
  * My 탭 화면
- * 1주차에서 만든 사용자 정보 표시 화면을 여기로 옮겼습니다
+ * 1주차에서 만든 메인페이지를 여기로 옮겼습니다
  */
 
 // 메인 화면 컴포저블
 // 로그인한 사용자의 정보를 표시
 @Composable
-fun MainScreen(
+fun MyScreen(
     modifier: Modifier = Modifier,
     userId: String,
     userNickname: String,
@@ -137,10 +137,10 @@ fun MainScreen(
 @Preview(showBackground = true, name = "Main Screen")
 @Composable
 private fun MainScreenPreview() {
-    MainScreen(
-        userId = "sample123",
-        userNickname = "규현",
-        userExtra = "가위",
-        userPw = "password"
+    MyScreen(
+        userId = "1234",
+        userNickname = "555",
+        userExtra = "421412",
+        userPw = "4444"
     )
 }

@@ -1,21 +1,44 @@
 package com.sopt.dive.core.ui.navigation
 
+import kotlinx.serialization.Serializable
 /**
- * 앱 내 모든 화면의 네비게이션 경로를 정의하는 sealed class
- * sealed class를 사용하면 컴파일러가 모든 케이스를 검증할 수 있어 안전
+ * 앱 내 모든 화면의 네비게이션 경로를 정의하는 sealed interface
+ * @Serializable을 붙여 Type-Safe Navigation 지원
  */
-sealed class NavigationRoute(val route: String) {
-    // 로그인 화면
-    object Login : NavigationRoute("login")
+sealed interface NavigationRoute {
 
-    // 회원가입 화면
-    object SignUp : NavigationRoute("signup")
+    // 파라미터가 없는 화면들은 data object 사용
+    @Serializable
+    data object Login : NavigationRoute
 
-    // 메인 화면 (바텀 네비게이션을 포함하는 컨테이너)
-    object Main : NavigationRoute("main")
+    @Serializable
+    data object SignUp : NavigationRoute
 
-    // 바텀 네비게이션의 각 탭
-    object Home : NavigationRoute("home")
-    object Search : NavigationRoute("search")
-    object My : NavigationRoute("my")
+    // 파라미터를 전달해야 하는 화면은 data class로 사용
+    @Serializable
+    data class Main(
+        val userId: String,
+        val userNickname: String,
+        val userExtra: String,
+        val userPw: String
+    ) : NavigationRoute
+
+    @Serializable
+    data class Home(
+        val userId: String = "",
+        val userNickname: String = "",
+        val userExtra: String = "",
+        val userPw: String = ""
+    ) : NavigationRoute
+
+    @Serializable
+    data object Search : NavigationRoute
+
+    @Serializable
+    data class My(
+        val userId: String = "",
+        val userNickname: String = "",
+        val userExtra: String = "",
+        val userPw: String = ""
+    ) : NavigationRoute
 }
