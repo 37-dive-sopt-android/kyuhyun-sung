@@ -48,65 +48,65 @@ class SignUpActivity : ComponentActivity() {
         }
     }
 
+    // 회원가입 유효성 검사 및 결과 반환
+    // Toast 메시지 로직을 통합하여 코드 중복 제거
     private fun handleSignUp(id: String, pw: String, nickname: String, extra: String) {
-        // 유효성 검사
-        when {
-            id.length !in 6..10 -> {
-                Toast.makeText(this, "ID는 6~10글자여야 합니다", Toast.LENGTH_SHORT).show()
+        // 유효성 검사를 통과하지 못하면 에러 메시지 반환, 모두 통과하면 null 반환
+        val errorMessage = when {
+            id.length !in 6..10 -> "ID는 6~10글자여야 합니다"
+            pw.length !in 8..12 -> "PW는 8~12글자여야 합니다"
+            nickname.isBlank() -> "닉네임을 입력해주세요"
+            extra.isBlank() -> "추가 정보를 입력해주세요"
+            else -> null
+        }
+
+        if (errorMessage != null) {
+            // 유효성 검사 실패 시 Toast 표시
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+        } else {
+            // 모든 유효성 검사 통과 시 데이터를 LoginActivity로 반환
+            val resultIntent = Intent().apply {
+                putExtra(IntentKeys.USER_ID, id)
+                putExtra(IntentKeys.USER_PW, pw)
+                putExtra(IntentKeys.USER_NICKNAME, nickname)
+                putExtra(IntentKeys.USER_EXTRA, extra)
             }
-            pw.length !in 8..12 -> {
-                Toast.makeText(this, "PW는 8~12글자여야 합니다", Toast.LENGTH_SHORT).show()
-            }
-            nickname.isBlank() -> {
-                Toast.makeText(this, "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
-            }
-            extra.isBlank() -> {
-                Toast.makeText(this, "추가 정보를 입력해주세요", Toast.LENGTH_SHORT).show()
-            }
-            else -> {
-                // 회원가입 성공 - 데이터 반환
-                val resultIntent = Intent().apply {
-                    putExtra(IntentKeys.USER_ID, id)
-                    putExtra(IntentKeys.USER_PW, pw)
-                    putExtra(IntentKeys.USER_NICKNAME, nickname)
-                    putExtra(IntentKeys.USER_EXTRA, extra)
-                }
-                setResult(RESULT_OK, resultIntent)
-                finish()
-            }
+            setResult(RESULT_OK, resultIntent)
+            finish()
         }
     }
 }
 
-// 2. 회원가입 페이지
+// 회원가입 화면 컴포저블
 @Composable
 fun SignUpScreen(
-    modifier: Modifier = Modifier, // modifier 뚫어주기
+    modifier: Modifier = Modifier,
     onSignUpClick: (String, String, String, String) -> Unit
 ) {
-    // ID와 PW를 각각 별도의 상태로 관리
+    // 각 입력 필드의 상태를 별도로 관리
     var idText by remember { mutableStateOf("") }
     var pwText by remember { mutableStateOf("") }
     var nicknameText by remember { mutableStateOf("") }
     var numberText by remember { mutableStateOf("") }
 
-    Column( // Q :이거 컴포넌트 효율적으로 쓰는 방법없음 ? 참조로 바든 방법이라든가 이거 코드너무커진다
+    Column(
         modifier = modifier
-            .fillMaxSize() // 화면 전체를 채움
-            .padding(horizontal = 24.dp) // 좌우 여백 24dp 적용
+            .fillMaxSize()
+            .padding(horizontal = 24.dp)
     ) {
         // 상단 타이틀
         Text(
             text = "SIGN UP",
             modifier = Modifier
-                .fillMaxWidth() // 가로 전체를 채움
-                .padding(top = 50.dp, bottom = 40.dp), // 상하 여백 적용
-            textAlign = TextAlign.Center, // 텍스트 중앙 정렬
+                .fillMaxWidth()
+                .padding(top = 50.dp, bottom = 40.dp),
+            textAlign = TextAlign.Center,
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
         )
 
-        // ID 입력
+        // ID 입력 필드
+        // BasicTextField를 사용하여 커스텀 디자인 적용
         Column {
             Text(text = "ID", fontSize = 20.sp)
 
@@ -122,8 +122,10 @@ fun SignUpScreen(
                                 color = Color(0xFFE0E0E0),
                                 shape = RoundedCornerShape(size = 16.dp)
                             )
-                            .padding(horizontal = 16.dp, vertical = 16.dp)
+                            // fillMaxWidth를 사용하므로 horizontal padding은 불필요
+                            .padding(vertical = 16.dp)
                     ) {
+                        // placeholder 텍스트 표시
                         if (idText.isEmpty()) {
                             Text(
                                 text = "아이디를 입력해 주세요.",
@@ -139,7 +141,7 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // PW 입력
+        // PW 입력 필드
         Column {
             Text(text = "PW", fontSize = 20.sp)
 
@@ -147,7 +149,7 @@ fun SignUpScreen(
                 value = pwText,
                 onValueChange = { pwText = it },
                 modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = PasswordVisualTransformation(),  // 비밀번호 마스킹
                 decorationBox = { innerTextField ->
                     Box(
                         modifier = Modifier
@@ -156,7 +158,7 @@ fun SignUpScreen(
                                 color = Color(0xFFE0E0E0),
                                 shape = RoundedCornerShape(size = 16.dp)
                             )
-                            .padding(horizontal = 16.dp, vertical = 16.dp)
+                            .padding(vertical = 16.dp)
                     ) {
                         if (pwText.isEmpty()) {
                             Text(
@@ -173,7 +175,7 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // NICKNAME 입력
+        // NICKNAME 입력 필드
         Column {
             Text(text = "NICKNAME", fontSize = 20.sp)
 
@@ -189,7 +191,7 @@ fun SignUpScreen(
                                 color = Color(0xFFE0E0E0),
                                 shape = RoundedCornerShape(size = 16.dp)
                             )
-                            .padding(horizontal = 16.dp, vertical = 16.dp)
+                            .padding(vertical = 16.dp)
                     ) {
                         if (nicknameText.isEmpty()) {
                             Text(
@@ -206,7 +208,7 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-
+        // 추가 정보 입력 필드 (가위바위보)
         Column {
             Text(text = "가위바위보", fontSize = 20.sp)
 
@@ -222,7 +224,7 @@ fun SignUpScreen(
                                 color = Color(0xFFE0E0E0),
                                 shape = RoundedCornerShape(size = 16.dp)
                             )
-                            .padding(horizontal = 16.dp, vertical = 16.dp)
+                            .padding(vertical = 16.dp)
                     ) {
                         if (numberText.isEmpty()) {
                             Text(
@@ -237,12 +239,12 @@ fun SignUpScreen(
             )
         }
 
-        // 중간 공간을 모두 채워서 하단 버튼들을 화면 아래로 밀어냄
+        // 중간 공간을 채워서 버튼을 화면 하단으로 배치
         Spacer(modifier = Modifier.weight(1f))
 
         // 회원가입 버튼
         Button(
-            onClick = { /* 회원가입 로직 구현 */ onSignUpClick(idText, pwText, nicknameText, numberText) },
+            onClick = { onSignUpClick(idText, pwText, nicknameText, numberText) },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
             shape = RoundedCornerShape(8.dp)
@@ -256,8 +258,9 @@ fun SignUpScreen(
     }
 }
 
+// Preview 함수는 UI 확인용으로만 사용되므로 private으로 선언
 @Preview(showBackground = true, name = "SignUp Screen")
 @Composable
-fun SignUpScreenPreview() {
-    //SignUpScreen()
+private fun SignUpScreenPreview() {
+    SignUpScreen(onSignUpClick = { _, _, _, _ -> })
 }

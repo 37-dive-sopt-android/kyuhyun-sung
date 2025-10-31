@@ -66,33 +66,31 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // LoginActivity에서 받은 데이터
+        // LoginActivity에서 Intent로 전달받은 사용자 데이터
         val userId = intent.getStringExtra(IntentKeys.USER_ID) ?: ""
         val userNickname = intent.getStringExtra(IntentKeys.USER_NICKNAME) ?: ""
         val userExtra = intent.getStringExtra(IntentKeys.USER_EXTRA) ?: ""
         val userPw = intent.getStringExtra(IntentKeys.USER_PW) ?: ""
 
-
         enableEdgeToEdge()
         setContent {
-            DiveTheme{
+            DiveTheme {
                 MainScreen(
                     userId = userId,
                     userNickname = userNickname,
                     userExtra = userExtra,
                     userPw = userPw
                 )
-                //LoginScreen()
-                //SignUpScreen()
             }
         }
     }
 }
 
-// 3. 메인페이지
+// 메인 화면 컴포저블
+// 로그인한 사용자의 정보를 표시
 @Composable
 fun MainScreen(
-    modifier: Modifier = Modifier, // Modifier 뚫어주기
+    modifier: Modifier = Modifier,
     userId: String,
     userNickname: String,
     userExtra: String,
@@ -100,7 +98,8 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
 
-    // ImageLoader를 Composable 내부에서 생성
+    // Coil 라이브러리를 사용하여 GIF 이미지를 로드하기 위한 ImageLoader 설정
+    // GifDecoder를 추가하여 GIF 포맷 지원
     val imageLoader = remember {
         ImageLoader.Builder(context)
             .components {
@@ -108,91 +107,97 @@ fun MainScreen(
             }
             .build()
     }
+
     Column(
         modifier = modifier
-            .fillMaxSize() // 화면 전체를 채움
-            .padding(horizontal = 24.dp) // 좌우 여백 24dp 적용
+            .fillMaxSize()
+            .padding(horizontal = 24.dp)
     ) {
-        // 자기소개 페이지
+        // 환영 메시지
         Text(
             text = "안녕하세요 ${userNickname}님",
             modifier = Modifier
-                .fillMaxWidth() // 가로 전체를 채움
-                .padding(top = 50.dp, bottom = 40.dp), // 상하 여백 적용
+                .fillMaxWidth()
+                .padding(top = 50.dp, bottom = 40.dp),
             textAlign = TextAlign.Left,
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
         )
 
+        // 사용자 ID 표시
         Column {
             Text(text = "ID", fontSize = 20.sp)
 
             Text(
-                modifier = Modifier
-                    .background(Color.Yellow),  // 배경색
+                modifier = Modifier.background(Color.Yellow),
                 text = userId,
                 fontWeight = FontWeight.Bold,
                 fontSize = 15.sp
-
             )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Column{
+        // 사용자 비밀번호 표시
+        Column {
             Text(text = "PW", fontSize = 20.sp)
 
             Text(
-                modifier = Modifier
-                    .background(Color.Yellow),  // 배경색
+                modifier = Modifier.background(Color.Yellow),
                 text = userPw,
                 fontWeight = FontWeight.Bold,
                 fontSize = 15.sp
-
             )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // 사용자 닉네임 표시
         Column {
             Text(text = "NICKNAME", fontSize = 20.sp)
 
             Text(
-                modifier = Modifier
-                    .background(Color.Yellow),  // 배경색
+                modifier = Modifier.background(Color.Yellow),
                 text = userNickname,
                 fontWeight = FontWeight.Bold,
                 fontSize = 15.sp
-
             )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // 추가 정보 (가위바위보 결과) 표시
         Column {
             Text(text = "승자는 ?", fontSize = 20.sp)
 
             Text(
-                modifier = Modifier
-                    .background(Color.Yellow),  // 배경색
+                modifier = Modifier.background(Color.Yellow),
                 text = userExtra,
                 fontWeight = FontWeight.Bold,
                 fontSize = 15.sp
             )
         }
-        // GIF 표시
+
+        // GIF 이미지 표시
+        // AsyncImage를 사용하여 네트워크에서 GIF를 로드
         AsyncImage(
             model = "https://github.com/dmp100/dmp100/raw/main/gifs/gif1.gif",
             contentDescription = "GIF",
             imageLoader = imageLoader,
-            contentScale = ContentScale.Crop,  // 잘라서 채우기
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
     }
 }
 
+// Preview 함수는 UI 확인용으로만 사용되므로 private으로 선언
 @Preview(showBackground = true, name = "Main Screen")
 @Composable
-fun MainScreenPreview() {
-    //MainScreen()
+private fun MainScreenPreview() {
+    MainScreen(
+        userId = "sample123",
+        userNickname = "규현",
+        userExtra = "가위",
+        userPw = "password"
+    )
 }
