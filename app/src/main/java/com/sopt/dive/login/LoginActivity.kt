@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sopt.dive.IntentKeys
 import com.sopt.dive.MainActivity
+import com.sopt.dive.noRippleClickable
 import com.sopt.dive.signup.SignUpActivity
 
 class LoginActivity : ComponentActivity() {
@@ -270,11 +271,7 @@ fun LoginScreen(
         Box(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null, // 리플 효과 제거
-                    onClick = onSignUpClick
-                )
+                .noRippleClickable(onSignUpClick) // 확장함수 ModiferExtension.kt에서 받아옴
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
