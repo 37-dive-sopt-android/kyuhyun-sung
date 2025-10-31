@@ -1,4 +1,4 @@
-package com.sopt.dive
+package com.sopt.dive.core.common
 
 // 공통 object 파일 생성
 object IntentKeys {
