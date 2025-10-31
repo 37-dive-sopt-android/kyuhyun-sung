@@ -163,6 +163,7 @@ class LoginActivity : ComponentActivity() {
 // 로그인 페이지
 @Composable
 fun LoginScreen(
+    modifier: Modifier = Modifier,
     onLoginClick: (String, String) -> Unit,
     onSignUpClick: () -> Unit
 ) {
@@ -179,10 +180,10 @@ fun LoginScreen(
     val scrollState = rememberScrollState()
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .verticalScroll(scrollState) // 키보드 올라올 때 스크롤 가능
-            .imePadding() // 키보드가 올라올 때 하단 패딩 자동 추가
+            .verticalScroll(scrollState)
+            .imePadding()
             .padding(horizontal = 24.dp)
     ) {
         // 상단 타이틀

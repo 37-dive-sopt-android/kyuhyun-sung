@@ -81,6 +81,7 @@ class SignUpActivity : ComponentActivity() {
 // 2. 회원가입 페이지
 @Composable
 fun SignUpScreen(
+    modifier: Modifier = Modifier, // modifier 뚫어주기
     onSignUpClick: (String, String, String, String) -> Unit
 ) {
     // ID와 PW를 각각 별도의 상태로 관리
@@ -90,7 +91,7 @@ fun SignUpScreen(
     var numberText by remember { mutableStateOf("") }
 
     Column( // Q :이거 컴포넌트 효율적으로 쓰는 방법없음 ? 참조로 바든 방법이라든가 이거 코드너무커진다
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize() // 화면 전체를 채움
             .padding(horizontal = 24.dp) // 좌우 여백 24dp 적용
     ) {
@@ -106,7 +107,7 @@ fun SignUpScreen(
         )
 
         // ID 입력
-        Column(modifier = Modifier) {
+        Column {
             Text(text = "ID", fontSize = 20.sp)
 
             BasicTextField(
@@ -139,7 +140,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // PW 입력
-        Column(modifier = Modifier) {
+        Column {
             Text(text = "PW", fontSize = 20.sp)
 
             BasicTextField(
@@ -173,7 +174,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         // NICKNAME 입력
-        Column(modifier = Modifier) {
+        Column {
             Text(text = "NICKNAME", fontSize = 20.sp)
 
             BasicTextField(
@@ -206,7 +207,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
 
-        Column(modifier = Modifier) {
+        Column {
             Text(text = "가위바위보", fontSize = 20.sp)
 
             BasicTextField(

@@ -92,6 +92,7 @@ class MainActivity : ComponentActivity() {
 // 3. 메인페이지
 @Composable
 fun MainScreen(
+    modifier: Modifier = Modifier, // Modifier 뚫어주기
     userId: String,
     userNickname: String,
     userExtra: String,
@@ -108,7 +109,7 @@ fun MainScreen(
             .build()
     }
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize() // 화면 전체를 채움
             .padding(horizontal = 24.dp) // 좌우 여백 24dp 적용
     ) {
@@ -123,8 +124,7 @@ fun MainScreen(
             fontWeight = FontWeight.Bold,
         )
 
-        Column(modifier = Modifier)
-        {
+        Column {
             Text(text = "ID", fontSize = 20.sp)
 
             Text(
@@ -139,8 +139,7 @@ fun MainScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Column(modifier = Modifier)
-        {
+        Column{
             Text(text = "PW", fontSize = 20.sp)
 
             Text(
@@ -155,8 +154,7 @@ fun MainScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Column(modifier = Modifier)
-        {
+        Column {
             Text(text = "NICKNAME", fontSize = 20.sp)
 
             Text(
@@ -171,8 +169,7 @@ fun MainScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Column(modifier = Modifier)
-        {
+        Column {
             Text(text = "승자는 ?", fontSize = 20.sp)
 
             Text(
