@@ -32,10 +32,18 @@ import com.sopt.dive.feature.signup.components.SignUpTextFieldComponent
  * @param modifier 외부에서 전달받는 Modifier (재사용성을 위해)
  * @param onSignUpClick 회원가입 버튼 클릭 시 실행될 콜백 함수
  */
+
+data class SignUpData(
+    val userId: String,
+    val password: String,
+    val nickname: String,
+    val extra: String
+)
+
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    onSignUpClick: (String, String, String, String) -> Unit
+    onSignUpClick: (SignUpData) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -109,8 +117,16 @@ fun SignUpScreen(
                 if (errorMessage != null) {
                     Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                 } else {
-                    onSignUpClick(idText, pwText, nicknameText, numberText)
+                    onSignUpClick(
+                        SignUpData( // 파라미터 개선
+                            userId = idText,
+                            password = pwText,
+                            nickname = nicknameText,
+                            extra = numberText
+                        )
+                    )
                 }
+
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
@@ -130,5 +146,5 @@ fun SignUpScreen(
 @Preview(showBackground = true, name = "SignUp Screen")
 @Composable
 private fun SignUpScreenPreview() {
-    SignUpScreen(onSignUpClick = { _, _, _, _ -> })
+    SignUpScreen(onSignUpClick = { _ -> })
 }

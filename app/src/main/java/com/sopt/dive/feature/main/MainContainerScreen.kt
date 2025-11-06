@@ -8,9 +8,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.sopt.dive.core.ui.navigation.NavigationRoute
-import com.sopt.dive.feature.My.MyScreen
+import com.sopt.dive.feature.my.MyScreen
 import com.sopt.dive.feature.home.HomeScreen
 import com.sopt.dive.feature.main.components.BottomNavigationBar
 import com.sopt.dive.feature.search.SearchScreen

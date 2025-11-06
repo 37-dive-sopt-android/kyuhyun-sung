@@ -1,4 +1,4 @@
-package com.sopt.dive.feature.home.components
+package com.sopt.dive.feature.home.components.profile
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column

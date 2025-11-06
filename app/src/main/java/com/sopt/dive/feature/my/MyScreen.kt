@@ -1,4 +1,4 @@
-package com.sopt.dive.feature.My
+package com.sopt.dive.feature.my
 
 
 import androidx.compose.foundation.background
@@ -33,11 +33,11 @@ import coil.decode.GifDecoder
 // 로그인한 사용자의 정보를 표시
 @Composable
 fun MyScreen(
-    modifier: Modifier = Modifier,
     userId: String,
     userNickname: String,
     userExtra: String,
-    userPw: String
+    userPw: String,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
 
