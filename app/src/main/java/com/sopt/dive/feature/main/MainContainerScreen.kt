@@ -25,7 +25,7 @@ import com.sopt.dive.feature.search.SearchScreen
  */
 @Composable
 fun MainContainerScreen(
-    mainRoute: NavigationRoute.Main
+    mainRoute: NavigationRoute.MainContainer
 ) {
     // 바텀 네비게이션 탭 간 이동을 위한 별도의 NavController를 생성
     // 이것은 앱 전체 네비게이션과는 독립적으로 동작하는 내부 네비게이션입
@@ -39,22 +39,15 @@ fun MainContainerScreen(
             )
         }
     ) { innerPadding ->
-        // 바텀 네비게이션의 각 탭에 해당하는 화면들을 정의
         NavHost(
             navController = bottomNavController,
-            startDestination = NavigationRoute.Home(
-                userId = mainRoute.userId,
-                userNickname = mainRoute.userNickname,
-                userExtra = mainRoute.userExtra,
-                userPw = mainRoute.userPw
-            ),
+            startDestination = NavigationRoute.Home,  // 파라미터 제거
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable<NavigationRoute.Home> { backStackEntry ->
-                val homeArgs = backStackEntry.toRoute<NavigationRoute.Home>()
+            composable<NavigationRoute.Home> {
                 HomeScreen(
-                    userId = homeArgs.userId,
-                    userNickname = homeArgs.userNickname
+                    userId = mainRoute.userId,  // mainRoute에서 직접 전달
+                    userNickname = mainRoute.userNickname
                 )
             }
 
@@ -62,25 +55,25 @@ fun MainContainerScreen(
                 SearchScreen()
             }
 
-            composable<NavigationRoute.My> { backStackEntry ->
-                val myArgs = backStackEntry.toRoute<NavigationRoute.My>()
+            composable<NavigationRoute.My> {
                 MyScreen(
-                    userId = myArgs.userId,
-                    userNickname = myArgs.userNickname,
-                    userExtra = myArgs.userExtra,
-                    userPw = myArgs.userPw
+                    userId = mainRoute.userId,  // mainRoute에서 직접 전달
+                    userNickname = mainRoute.userNickname,
+                    userExtra = mainRoute.userExtra,
+                    userPw = mainRoute.userPw
                 )
             }
         }
     }
 }
 
+
 // Preview 함수는 UI 확인용으로만 사용되므로 private으로 선언
 @Preview(showBackground = true, name = "Main Container Screen")
 @Composable
 private fun MainContainerScreenPreview() {
     // Preview를 위한 더미 사용자 데이터 생성
-    val dummyMainRoute = NavigationRoute.Main(
+    val dummyMainRoute = NavigationRoute.MainContainer(
         userId = "previewUser",
         userNickname = "미리보기",
         userExtra = "가위",

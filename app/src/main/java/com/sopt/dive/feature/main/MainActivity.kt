@@ -29,12 +29,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-/**
- * 앱 전체의 Navigation Graph를 정의하는 Composable
- *
- * 로그인, 회원가입, 메인 화면 간의 네비게이션을 관리합니다.
- * 앱 시작 시 로그인 상태를 확인하여 자동 로그인 기능을 제공합니다.
- */
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -48,7 +42,7 @@ fun AppNavigation() {
             val userData = userPreferences.getUserData()
             if (userData != null) {
                 navController.navigate(
-                    NavigationRoute.Main(
+                    NavigationRoute.MainContainer(  // Main → MainContainer
                         userId = userData.userId,
                         userNickname = userData.userNickname,
                         userExtra = userData.userExtra,
@@ -77,7 +71,7 @@ fun AppNavigation() {
                         val userData = userPreferences.getUserData()
                         if (userData != null) {
                             navController.navigate(
-                                NavigationRoute.Main(
+                                NavigationRoute.MainContainer(  // Main → MainContainer
                                     userId = userData.userId,
                                     userNickname = userData.userNickname,
                                     userExtra = userData.userExtra,
@@ -112,8 +106,8 @@ fun AppNavigation() {
             )
         }
 
-        composable<NavigationRoute.Main> { backStackEntry ->
-            val mainArgs = backStackEntry.toRoute<NavigationRoute.Main>()
+        composable<NavigationRoute.MainContainer> { backStackEntry ->  // Main → MainContainer
+            val mainArgs = backStackEntry.toRoute<NavigationRoute.MainContainer>()
 
             MainContainerScreen(
                 mainRoute = mainArgs

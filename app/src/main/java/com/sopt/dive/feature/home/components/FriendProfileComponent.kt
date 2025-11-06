@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun FriendProfileComponent(name: String, statusMessage: String, hasMusic: Boolean) {
+fun FriendProfileComponent(name: String, statusMessage: String, hasMusic: Boolean, modifier: Modifier = Modifier  ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
