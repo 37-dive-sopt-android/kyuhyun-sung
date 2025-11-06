@@ -56,4 +56,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("io.coil-kt:coil-gif:2.5.0")
+
+    // liquid glass components - https://github.com/Kyant0/AndroidLiquidGlass/releases
+    //implementation("com.github.Kyant0:AndroidLiquidGlass:1.0.0-beta01")
+
 }
