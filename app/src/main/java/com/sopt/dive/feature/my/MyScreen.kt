@@ -12,6 +12,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,27 +45,29 @@ fun MyScreen(
     userPw: String,
     onNavigateToCard: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: MyViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
-    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
 
-    // Coil 라이브러리를 사용하여 GIF 이미지를 로드하기 위한 ImageLoader 설정
-    // GifDecoder를 추가하여 GIF 포맷 지원
+    // ViewModel에 유저 정보 전달
+    LaunchedEffect(Unit) {
+        viewModel.setUserInfo(userId, userPw, userNickname, userExtra)
+    }
+
+    val context = LocalContext.current
     val imageLoader = remember {
         ImageLoader.Builder(context)
-            .components {
-                add(GifDecoder.Factory())
-            }
+            .components { add(GifDecoder.Factory()) }
             .build()
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 24.dp)
     ) {
-        // 환영 메시지
         Text(
-            text = "안녕하세요 ${userNickname}님",
+            text = "안녕하세요 ${uiState.userNickname}님",
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 50.dp, bottom = 40.dp),
@@ -71,84 +76,47 @@ fun MyScreen(
             fontWeight = FontWeight.Bold,
         )
 
-        // 사용자 ID 표시
-        Column {
-            Text(text = "ID", fontSize = 20.sp)
-
-            Text(
-                modifier = Modifier.background(Color.Yellow),
-                text = userId,
-                fontWeight = FontWeight.Bold,
-                fontSize = 15.sp
-            )
-        }
-
+        InfoBlock(label = "ID", value = uiState.userId)
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 사용자 비밀번호 표시
-        Column {
-            Text(text = "PW", fontSize = 20.sp)
-
-            Text(
-                modifier = Modifier.background(Color.Yellow),
-                text = userPw,
-                fontWeight = FontWeight.Bold,
-                fontSize = 15.sp
-            )
-        }
-
+        InfoBlock(label = "PW", value = uiState.userPw)
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 사용자 닉네임 표시
-        Column {
-            Text(text = "NICKNAME", fontSize = 20.sp)
-
-            Text(
-                modifier = Modifier.background(Color.Yellow),
-                text = userNickname,
-                fontWeight = FontWeight.Bold,
-                fontSize = 15.sp
-            )
-        }
-
+        InfoBlock(label = "NICKNAME", value = uiState.userNickname)
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 추가 정보 (가위바위보 결과) 표시
-        Column {
-            Text(text = "승자는 ?", fontSize = 20.sp)
+        InfoBlock(label = "승자는 ?", value = uiState.userExtra)
 
-            Text(
-                modifier = Modifier.background(Color.Yellow),
-                text = userExtra,
-                fontWeight = FontWeight.Bold,
-                fontSize = 15.sp
-            )
-        }
         Button(
-            onClick = {
-                onNavigateToCard()
-            },
+            onClick = { onNavigateToCard() },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Yellow,      // 버튼 배경색 (가장 흔하게 변경)
-                contentColor = Color.Black,          // 버튼 내용(Text/Icon)의 색상
-                disabledContainerColor = Color.LightGray, // 비활성화됐을 때의 배경색
-                disabledContentColor = Color.DarkGray     // 비활성화됐을 때의 내용 색상
+                containerColor = Color.Yellow,
+                contentColor = Color.Black
             ),
-            enabled = true,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
-
             Text("GO to Card")
         }
-        // GIF 이미지 표시
-        // AsyncImage를 사용하여 네트워크에서 GIF를 로드
+
         AsyncImage(
             model = "https://github.com/dmp100/dmp100/raw/main/gifs/gif1.gif",
             contentDescription = "GIF",
             imageLoader = imageLoader,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+@Composable
+private fun InfoBlock(label: String, value: String) {
+    Column {
+        Text(text = label, fontSize = 20.sp)
+        Text(
+            modifier = Modifier.background(Color.Yellow),
+            text = value,
+            fontWeight = FontWeight.Bold,
+            fontSize = 15.sp
         )
     }
 }

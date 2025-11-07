@@ -33,24 +33,19 @@ import com.sopt.dive.feature.signup.components.SignUpTextFieldComponent
  * @param onSignUpClick 회원가입 버튼 클릭 시 실행될 콜백 함수
  */
 
-data class SignUpData(
-    val userId: String,
-    val password: String,
-    val nickname: String,
-    val extra: String
-)
 
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    onSignUpClick: (SignUpData) -> Unit
+    onSignUpClick: (SignUpData) -> Unit,
+    viewModel: SignUpViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val context = LocalContext.current
 
-    var idText by remember { mutableStateOf("") }
-    var pwText by remember { mutableStateOf("") }
-    var nicknameText by remember { mutableStateOf("") }
-    var numberText by remember { mutableStateOf("") }
+    val idText = viewModel.id.value
+    val pwText = viewModel.password.value
+    val nicknameText = viewModel.nickname.value
+    val numberText = viewModel.extra.value
 
     Column(
         modifier = modifier
@@ -70,7 +65,7 @@ fun SignUpScreen(
         SignUpTextFieldComponent(
             label = "ID",
             value = idText,
-            onValueChange = { idText = it },
+            onValueChange = { viewModel.onIdChange(it) },
             placeholder = "아이디를 입력해 주세요."
         )
 
@@ -79,7 +74,7 @@ fun SignUpScreen(
         SignUpTextFieldComponent(
             label = "PW",
             value = pwText,
-            onValueChange = { pwText = it },
+            onValueChange = { viewModel.onPasswordChange(it) },
             placeholder = "비밀번호를 입력해주세요.",
             isPassword = true
         )
@@ -89,7 +84,7 @@ fun SignUpScreen(
         SignUpTextFieldComponent(
             label = "NICKNAME",
             value = nicknameText,
-            onValueChange = { nicknameText = it },
+            onValueChange = { viewModel.onNicknameChange(it) },
             placeholder = "닉네임을 입력해주세요."
         )
 
@@ -98,7 +93,7 @@ fun SignUpScreen(
         SignUpTextFieldComponent(
             label = "가위바위보",
             value = numberText,
-            onValueChange = { numberText = it },
+            onValueChange = { viewModel.onExtraChange(it) },
             placeholder = "1은 가위, 2는 바위, 3은 보"
         )
 
@@ -106,27 +101,12 @@ fun SignUpScreen(
 
         Button(
             onClick = {
-                val errorMessage = when {
-                    idText.length !in 6..10 -> "ID는 6~10글자여야 합니다"
-                    pwText.length !in 8..12 -> "PW는 8~12글자여야 합니다"
-                    nicknameText.isBlank() -> "닉네임을 입력해주세요"
-                    numberText.isBlank() -> "추가 정보를 입력해주세요"
-                    else -> null
-                }
-
+                val errorMessage = viewModel.validateInput()
                 if (errorMessage != null) {
                     Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                 } else {
-                    onSignUpClick(
-                        SignUpData( // 파라미터 개선
-                            userId = idText,
-                            password = pwText,
-                            nickname = nicknameText,
-                            extra = numberText
-                        )
-                    )
+                    onSignUpClick(viewModel.getSignUpData())
                 }
-
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
