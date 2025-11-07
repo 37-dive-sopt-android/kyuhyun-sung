@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.sopt.dive.core.ui.navigation.NavigationRoute
+import com.sopt.dive.feature.card.FlippingCardScreen
 import com.sopt.dive.feature.my.MyScreen
 import com.sopt.dive.feature.home.HomeScreen
 import com.sopt.dive.feature.main.components.BottomNavigationBar
@@ -59,9 +60,16 @@ fun MainContainerScreen(
                     userId = mainRoute.userId,  // mainRoute에서 직접 전달
                     userNickname = mainRoute.userNickname,
                     userExtra = mainRoute.userExtra,
-                    userPw = mainRoute.userPw
+                    userPw = mainRoute.userPw,
+                    onNavigateToCard = {
+                        bottomNavController.navigate("card")
+                    }
                 )
             }
+            composable("card") {
+                FlippingCardScreen(navController = bottomNavController)
+            }
+
         }
     }
 }

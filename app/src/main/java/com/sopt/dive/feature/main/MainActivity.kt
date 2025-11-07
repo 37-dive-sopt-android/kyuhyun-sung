@@ -14,6 +14,7 @@ import androidx.navigation.toRoute
 import com.sopt.dive.core.data.UserPreferences
 import com.sopt.dive.core.ui.navigation.NavigationRoute
 import com.sopt.dive.core.ui.theme.DiveTheme
+import com.sopt.dive.feature.card.FlippingCardScreen
 import com.sopt.dive.feature.login.LoginScreen
 import com.sopt.dive.feature.signup.SignUpScreen
 
@@ -94,9 +95,14 @@ fun AppNavigation() {
 
         composable<NavigationRoute.SignUp> {
             SignUpScreen(
-                onSignUpClick = { id, pw, nickname, extra ->
+                onSignUpClick = { signUpData ->
                     // 회원가입 정보를 SharedPreferences에 저장
-                    userPreferences.saveUser(id, pw, nickname, extra)
+                    userPreferences.saveUser(
+                        signUpData.userId,
+                        signUpData.password,
+                        signUpData.nickname,
+                        signUpData.extra
+                    )
 
                     // 회원가입 성공 후 로그인 화면
                     navController.navigate(NavigationRoute.Login) {
@@ -112,6 +118,9 @@ fun AppNavigation() {
             MainContainerScreen(
                 mainRoute = mainArgs
             )
+        }
+        composable<NavigationRoute.Card> {
+            FlippingCardScreen(navController = navController)
         }
     }
 }

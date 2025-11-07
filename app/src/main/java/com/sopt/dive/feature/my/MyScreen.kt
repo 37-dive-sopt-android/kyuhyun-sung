@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -37,6 +40,7 @@ fun MyScreen(
     userNickname: String,
     userExtra: String,
     userPw: String,
+    onNavigateToCard: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -52,7 +56,7 @@ fun MyScreen(
     }
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 24.dp)
     ) {
@@ -120,7 +124,23 @@ fun MyScreen(
                 fontSize = 15.sp
             )
         }
+        Button(
+            onClick = {
+                onNavigateToCard()
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Yellow,      // 버튼 배경색 (가장 흔하게 변경)
+                contentColor = Color.Black,          // 버튼 내용(Text/Icon)의 색상
+                disabledContainerColor = Color.LightGray, // 비활성화됐을 때의 배경색
+                disabledContentColor = Color.DarkGray     // 비활성화됐을 때의 내용 색상
+            ),
+            enabled = true,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+        ) {
 
+            Text("GO to Card")
+        }
         // GIF 이미지 표시
         // AsyncImage를 사용하여 네트워크에서 GIF를 로드
         AsyncImage(
@@ -141,6 +161,7 @@ private fun MainScreenPreview() {
         userId = "1234",
         userNickname = "555",
         userExtra = "421412",
-        userPw = "4444"
+        userPw = "4444",
+        onNavigateToCard = {} // 더미는 이렇게
     )
 }

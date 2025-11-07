@@ -24,6 +24,9 @@ sealed interface NavigationRoute {
         val userPw: String
     ) : NavigationRoute
 
+    @Serializable
+    data object Card : NavigationRoute
+
     // 바텀 네비게이션 탭들
     @Serializable
     data object Home : NavigationRoute
