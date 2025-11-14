@@ -8,12 +8,13 @@ class MyViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(MyUiState())
     val uiState: StateFlow<MyUiState> = _uiState
 
-    fun setUserInfo(id: String, pw: String, nickname: String, extra: String) {
+    fun setUserInfo(userId: String, userPw: String, userNickname: String, userEmail: String, userAge: Int) {
         _uiState.value = MyUiState(
-            userId = id,
-            userPw = pw,
-            userNickname = nickname,
-            userExtra = extra
+            userId = userId,
+            userPw = userPw,
+            userNickname = userNickname,
+            userEmail = userEmail,    // userExtra → userEmail
+            userAge = userAge         // age 추가
         )
     }
 }

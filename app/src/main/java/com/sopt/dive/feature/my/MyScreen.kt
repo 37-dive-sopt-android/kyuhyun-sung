@@ -1,6 +1,5 @@
 package com.sopt.dive.feature.my
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,18 +29,12 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.GifDecoder
 
-/**
- * My 탭 화면
- * 1주차에서 만든 메인페이지를 여기로 옮겼습니다
- */
-
-// 메인 화면 컴포저블
-// 로그인한 사용자의 정보를 표시
 @Composable
 fun MyScreen(
     userId: String,
     userNickname: String,
-    userExtra: String,
+    userEmail: String,    // userExtra → userEmail
+    userAge: Int,         // age 추가
     userPw: String,
     onNavigateToCard: () -> Unit,
     modifier: Modifier = Modifier,
@@ -51,7 +44,7 @@ fun MyScreen(
 
     // ViewModel에 유저 정보 전달
     LaunchedEffect(Unit) {
-        viewModel.setUserInfo(userId, userPw, userNickname, userExtra)
+        viewModel.setUserInfo(userId, userPw, userNickname, userEmail, userAge)  // ✅ 파라미터 수정
     }
 
     val context = LocalContext.current
@@ -85,7 +78,10 @@ fun MyScreen(
         InfoBlock(label = "NICKNAME", value = uiState.userNickname)
         Spacer(modifier = Modifier.height(24.dp))
 
-        InfoBlock(label = "승자는 ?", value = uiState.userExtra)
+        InfoBlock(label = "EMAIL", value = uiState.userEmail)  // 이메일 표시
+        Spacer(modifier = Modifier.height(24.dp))
+
+        InfoBlock(label = "AGE", value = uiState.userAge.toString())  // 나이 표시
 
         Button(
             onClick = { onNavigateToCard() },
@@ -121,15 +117,15 @@ private fun InfoBlock(label: String, value: String) {
     }
 }
 
-// Preview 함수는 UI 확인용으로만 사용되므로 private으로 선언
 @Preview(showBackground = true, name = "Main Screen")
 @Composable
 private fun MainScreenPreview() {
     MyScreen(
         userId = "1234",
         userNickname = "555",
-        userExtra = "421412",
+        userEmail = "test@example.com",  // userExtra → userEmail
+        userAge = 25,                    // age 추가
         userPw = "4444",
-        onNavigateToCard = {} // 더미는 이렇게
+        onNavigateToCard = {}
     )
 }

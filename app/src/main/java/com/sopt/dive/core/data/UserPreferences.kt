@@ -21,11 +21,12 @@ class UserPreferences private constructor(context: Context) {
     companion object {
         private const val PREFS_NAME = "user_prefs"
 
-        // SharedPreferences에 저장할 때 사용할 키 값들
+        // 키 값들 업데이트
         private const val KEY_USER_ID = "user_id"
         private const val KEY_USER_PW = "user_pw"
         private const val KEY_USER_NICKNAME = "user_nickname"
-        private const val KEY_USER_EXTRA = "user_extra"
+        private const val KEY_USER_EMAIL = "user_email"     // ✅ extra → email
+        private const val KEY_USER_AGE = "user_age"         // ✅ age 추가
         private const val KEY_IS_LOGGED_IN = "is_logged_in"
 
         // Singleton 인스턴스
@@ -51,16 +52,16 @@ class UserPreferences private constructor(context: Context) {
      * 회원가입 시 사용자 정보를 저장합니다.
      *
      */
-    fun saveUser(userId: String, userPw: String, userNickname: String, userExtra: String) {
+    fun saveUser(userId: String, userPw: String, userNickname: String, userEmail: String, userAge: Int) {
         prefs.edit().apply {
             putString(KEY_USER_ID, userId)
             putString(KEY_USER_PW, userPw)
             putString(KEY_USER_NICKNAME, userNickname)
-            putString(KEY_USER_EXTRA, userExtra)
+            putString(KEY_USER_EMAIL, userEmail)       // 이메일 저장
+            putInt(KEY_USER_AGE, userAge)              // 나이 저장
             apply()
         }
     }
-
     /**
      * 로그인 시 입력한 ID와 비밀번호가 저장된 정보와 일치하는지 확인합니다.
      *
@@ -102,11 +103,11 @@ class UserPreferences private constructor(context: Context) {
         val userId = prefs.getString(KEY_USER_ID, null)
         val userPw = prefs.getString(KEY_USER_PW, null)
         val userNickname = prefs.getString(KEY_USER_NICKNAME, null)
-        val userExtra = prefs.getString(KEY_USER_EXTRA, null)
+        val userEmail = prefs.getString(KEY_USER_EMAIL, null)    // 이메일 가져오기
+        val userAge = prefs.getInt(KEY_USER_AGE, 0)              // 나이 가져오기
 
-        // 모든 정보가 있을 때만 UserData 객체를 반환합니다
-        return if (userId != null && userPw != null && userNickname != null && userExtra != null) {
-            UserData(userId, userPw, userNickname, userExtra)
+        return if (userId != null && userPw != null && userNickname != null && userEmail != null && userAge > 0) {
+            UserData(userId, userPw, userNickname, userEmail, userAge)  // ✅ 새 구조
         } else {
             null
         }
@@ -139,5 +140,6 @@ data class UserData(
     val userId: String,
     val userPw: String,
     val userNickname: String,
-    val userExtra: String
+    val userEmail: String,    // extra → email
+    val userAge: Int          // age 추가
 )

@@ -43,10 +43,11 @@ fun AppNavigation() {
             val userData = userPreferences.getUserData()
             if (userData != null) {
                 navController.navigate(
-                    NavigationRoute.MainContainer(  // Main → MainContainer
+                    NavigationRoute.MainContainer(
                         userId = userData.userId,
                         userNickname = userData.userNickname,
-                        userExtra = userData.userExtra,
+                        userEmail = userData.userEmail,
+                        userAge = userData.userAge,
                         userPw = userData.userPw
                     )
                 ) {
@@ -72,10 +73,11 @@ fun AppNavigation() {
                         val userData = userPreferences.getUserData()
                         if (userData != null) {
                             navController.navigate(
-                                NavigationRoute.MainContainer(  // Main → MainContainer
+                                NavigationRoute.MainContainer(
                                     userId = userData.userId,
                                     userNickname = userData.userNickname,
-                                    userExtra = userData.userExtra,
+                                    userEmail = userData.userEmail,
+                                    userAge = userData.userAge,
                                     userPw = userData.userPw
                                 )
                             ) {
@@ -101,7 +103,8 @@ fun AppNavigation() {
                         signUpData.userId,
                         signUpData.password,
                         signUpData.nickname,
-                        signUpData.extra
+                        signUpData.email,
+                        signUpData.age
                     )
 
                     // 회원가입 성공 후 로그인 화면
@@ -112,13 +115,14 @@ fun AppNavigation() {
             )
         }
 
-        composable<NavigationRoute.MainContainer> { backStackEntry ->  // Main → MainContainer
+        composable<NavigationRoute.MainContainer> { backStackEntry ->
             val mainArgs = backStackEntry.toRoute<NavigationRoute.MainContainer>()
 
             MainContainerScreen(
                 mainRoute = mainArgs
             )
         }
+
         composable<NavigationRoute.Card> {
             FlippingCardScreen(
                 onNavigateBack = { navController.popBackStack() }
