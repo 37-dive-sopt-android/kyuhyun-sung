@@ -120,7 +120,9 @@ fun AppNavigation() {
             )
         }
         composable<NavigationRoute.Card> {
-            FlippingCardScreen(navController = navController)
+            FlippingCardScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }

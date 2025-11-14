@@ -62,12 +62,16 @@ fun MainContainerScreen(
                     userExtra = mainRoute.userExtra,
                     userPw = mainRoute.userPw,
                     onNavigateToCard = {
-                        bottomNavController.navigate("card")
+                        //  NavigationRoute.Card 사용
+                        bottomNavController.navigate(NavigationRoute.Card)
                     }
                 )
             }
-            composable("card") {
-                FlippingCardScreen(navController = bottomNavController)
+            // 수정 (리뷰 댓글 반영)
+            composable<NavigationRoute.Card> {
+                FlippingCardScreen(
+                    onNavigateBack = { bottomNavController.popBackStack() }
+                )
             }
 
         }
