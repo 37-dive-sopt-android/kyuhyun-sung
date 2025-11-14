@@ -39,7 +39,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sopt.dive.core.data.UserPreferences
 import com.sopt.dive.core.ui.noRippleClickable
 
 /**
@@ -114,7 +113,7 @@ fun LoginScreen(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
             keyboardActions = KeyboardActions(
                 onGo = {
-                    viewModel.validateLogin(
+                    viewModel.loginWithApi(  //수정
                         onSuccess = { id, pw -> onLoginClick(id, pw) },
                         onFailure = { msg ->
                             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
@@ -128,18 +127,22 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                viewModel.validateLogin(
+                viewModel.loginWithApi(  // validateLogin → loginWithApi
                     onSuccess = { id, pw -> onLoginClick(id, pw) },
                     onFailure = { msg ->
                         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                     }
                 )
             },
+            enabled = !uiState.isLoading,  // 로딩 중 버튼 비활성화
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
             shape = RoundedCornerShape(8.dp)
         ) {
-            Text("로그인", color = Color.White)
+            Text(
+                text = if (uiState.isLoading) "로그인 중..." else "로그인",  // 로딩 표시
+                color = Color.White
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))

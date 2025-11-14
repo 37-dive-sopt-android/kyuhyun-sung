@@ -12,10 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -25,14 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sopt.dive.feature.signup.components.SignUpTextFieldComponent
-
-/**
- * 회원가입 화면 컴포저블
- *
- * @param modifier 외부에서 전달받는 Modifier (재사용성을 위해)
- * @param onSignUpClick 회원가입 버튼 클릭 시 실행될 콜백 함수
- */
-
+import com.sopt.dive.feature.signup.viewmodel.SignUpViewModel
 
 @Composable
 fun SignUpScreen(
@@ -45,7 +34,8 @@ fun SignUpScreen(
     val idText = viewModel.id.value
     val pwText = viewModel.password.value
     val nicknameText = viewModel.nickname.value
-    val numberText = viewModel.extra.value
+    val emailText = viewModel.email.value  //  이메일 추가
+    val ageText = viewModel.age.value      //  나이 추가
 
     Column(
         modifier = modifier
@@ -82,19 +72,30 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         SignUpTextFieldComponent(
-            label = "NICKNAME",
+            label = "NAME",
             value = nicknameText,
             onValueChange = { viewModel.onNicknameChange(it) },
-            placeholder = "닉네임을 입력해주세요."
+            placeholder = "이름을 입력해주세요."
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // 이메일 필드 추가
         SignUpTextFieldComponent(
-            label = "가위바위보",
-            value = numberText,
-            onValueChange = { viewModel.onExtraChange(it) },
-            placeholder = "1은 가위, 2는 바위, 3은 보"
+            label = "EMAIL",
+            value = emailText,
+            onValueChange = { viewModel.onEmailChange(it) },
+            placeholder = "이메일을 입력해주세요."
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 나이 필드 추가
+        SignUpTextFieldComponent(
+            label = "AGE",
+            value = ageText,
+            onValueChange = { viewModel.onAgeChange(it) },
+            placeholder = "나이를 입력해주세요."
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -105,15 +106,24 @@ fun SignUpScreen(
                 if (errorMessage != null) {
                     Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                 } else {
-                    onSignUpClick(viewModel.getSignUpData())
+                    viewModel.signUpWithApi(
+                        onSuccess = {
+                            Toast.makeText(context, "회원가입 성공!", Toast.LENGTH_SHORT).show()
+                            onSignUpClick(viewModel.getSignUpData())
+                        },
+                        onError = { error ->
+                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        }
+                    )
                 }
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(8.dp),
+            enabled = !viewModel.isLoading.value
         ) {
             Text(
-                text = "회원가입",
+                text = if (viewModel.isLoading.value) "처리 중..." else "회원가입",
                 color = Color.White,
                 modifier = Modifier.padding(vertical = 8.dp)
             )

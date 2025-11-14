@@ -20,7 +20,8 @@ sealed interface NavigationRoute {
     data class MainContainer(
         val userId: String,
         val userNickname: String,
-        val userExtra: String,
+        val userEmail: String,    // userExtra → userEmail
+        val userAge: Int,         // age 추가
         val userPw: String
     ) : NavigationRoute
 
