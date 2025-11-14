@@ -11,7 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.sopt.dive.core.data.UserPreferences
+import com.sopt.dive.core.data.AuthPreferences  // ✅ UserPreferences → AuthPreferences
 import com.sopt.dive.core.ui.navigation.NavigationRoute
 import com.sopt.dive.core.ui.theme.DiveTheme
 import com.sopt.dive.feature.card.FlippingCardScreen
@@ -34,24 +34,23 @@ class MainActivity : ComponentActivity() {
 fun AppNavigation() {
     val navController = rememberNavController()
     val context = LocalContext.current
-    val userPreferences = UserPreferences.getInstance(context)
+    val authPreferences = AuthPreferences.getInstance(context)  // 변경
 
-    // 로그인 상태를 확인하여 자동 로그인을 처리
+    // 자동 로그인 처리
     LaunchedEffect(Unit) {
-        if (userPreferences.isLoggedIn()) {
-            // 이미 로그인되어 있다면 저장된 사용자 정보를 불러와서 메인 화면으로 이동
-            val userData = userPreferences.getUserData()
-            if (userData != null) {
+        if (authPreferences.isLoggedIn()) {
+            val loginInfo = authPreferences.getLoginInfo()
+            if (loginInfo != null) {
+                // 저장된 userId로 바로 이동 (사용자 정보는 MyScreen에서 API로 가져옴)
                 navController.navigate(
                     NavigationRoute.MainContainer(
-                        userId = userData.userId,
-                        userNickname = userData.userNickname,
-                        userEmail = userData.userEmail,
-                        userAge = userData.userAge,
-                        userPw = userData.userPw
+                        userId = loginInfo.userId.toString(),  // 실제 userId
+                        userNickname = "로딩중...",  // 임시값 (API에서 갱신됨)
+                        userEmail = "로딩중...",
+                        userAge = 0,
+                        userPw = loginInfo.password
                     )
                 ) {
-                    // 로그인 화면을 백스택에서 제거하여 뒤로가기로 돌아갈 수 없도록 함
                     popUpTo(NavigationRoute.Login) { inclusive = true }
                 }
             }
@@ -64,29 +63,25 @@ fun AppNavigation() {
     ) {
         composable<NavigationRoute.Login> {
             LoginScreen(
-                onLoginClick = { id, pw ->
-                    // 입력한 ID와 비밀번호가 저장된 정보와 일치하는지 확인
-                    if (userPreferences.validateLogin(id, pw)) {
-                        // 로그인 성공: 로그인 상태를 저장하고 메인 화면으로 이동
-                        userPreferences.setLoggedIn(true)
+                onLoginClick = { userId, password ->
+                    //API 로그인 성공 시 AuthPreferences에 저장
+                    val userIdInt = userId.toIntOrNull() ?: 0
+                    authPreferences.saveLoginInfo(
+                        userId = userIdInt,  // 실제 userId (359)
+                        username = "unknown",  // username을 모르므로 임시값
+                        password = password
+                    )
 
-                        val userData = userPreferences.getUserData()
-                        if (userData != null) {
-                            navController.navigate(
-                                NavigationRoute.MainContainer(
-                                    userId = userData.userId,
-                                    userNickname = userData.userNickname,
-                                    userEmail = userData.userEmail,
-                                    userAge = userData.userAge,
-                                    userPw = userData.userPw
-                                )
-                            ) {
-                                popUpTo<NavigationRoute.Login> { inclusive = true }
-                            }
-                        }
-                    } else {
-                        // 로그인 실패: 사용자에게 에러 메시지 표시
-                        android.util.Log.e("AppNavigation", "로그인 실패: ID 또는 비밀번호가 일치하지 않습니다")
+                    navController.navigate(
+                        NavigationRoute.MainContainer(
+                            userId = userId,  // 실제 userId (359)
+                            userNickname = "로딩중...",
+                            userEmail = "로딩중...",
+                            userAge = 0,
+                            userPw = password
+                        )
+                    ) {
+                        popUpTo<NavigationRoute.Login> { inclusive = true }
                     }
                 },
                 onSignUpClick = {
@@ -98,16 +93,7 @@ fun AppNavigation() {
         composable<NavigationRoute.SignUp> {
             SignUpScreen(
                 onSignUpClick = { signUpData ->
-                    // 회원가입 정보를 SharedPreferences에 저장
-                    userPreferences.saveUser(
-                        signUpData.userId,
-                        signUpData.password,
-                        signUpData.nickname,
-                        signUpData.email,
-                        signUpData.age
-                    )
-
-                    // 회원가입 성공 후 로그인 화면
+                    // 로컬 저장 제거
                     navController.navigate(NavigationRoute.Login) {
                         popUpTo<NavigationRoute.SignUp> { inclusive = true }
                     }

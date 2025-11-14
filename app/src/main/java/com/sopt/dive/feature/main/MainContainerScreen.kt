@@ -59,8 +59,8 @@ fun MainContainerScreen(
                 MyScreen(
                     userId = mainRoute.userId,
                     userNickname = mainRoute.userNickname,
-                    userEmail = mainRoute.userEmail,    // ✅ userExtra → userEmail
-                    userAge = mainRoute.userAge,        // ✅ age 추가
+                    userEmail = mainRoute.userEmail,    // userExtra → userEmail
+                    userAge = mainRoute.userAge,        // age 추가
                     userPw = mainRoute.userPw,
                     onNavigateToCard = {
                         bottomNavController.navigate(NavigationRoute.Card)

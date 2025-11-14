@@ -39,7 +39,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sopt.dive.core.data.UserPreferences
 import com.sopt.dive.core.ui.noRippleClickable
 
 /**
@@ -114,7 +113,7 @@ fun LoginScreen(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
             keyboardActions = KeyboardActions(
                 onGo = {
-                    viewModel.validateLogin(
+                    viewModel.loginWithApi(  //수정
                         onSuccess = { id, pw -> onLoginClick(id, pw) },
                         onFailure = { msg ->
                             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
