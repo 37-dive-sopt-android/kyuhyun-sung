@@ -19,6 +19,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,14 +52,13 @@ import com.sopt.dive.core.ui.noRippleClickable
 fun LoginScreen(
     modifier: Modifier = Modifier,
     onLoginClick: (String, String) -> Unit,
-    onSignUpClick: () -> Unit
+    onSignUpClick: () -> Unit,
+    viewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+        factory = LoginViewModelFactory(LocalContext.current)
+    )
 ) {
     val context = LocalContext.current
-    val userPreferences = UserPreferences.getInstance(context)
-
-    var idText by remember { mutableStateOf("") }
-    var pwText by remember { mutableStateOf("") }
-
+    val uiState by viewModel.uiState.collectAsState()
     val focusRequester = remember { FocusRequester() }
     val scrollState = rememberScrollState()
 
@@ -88,29 +88,22 @@ fun LoginScreen(
         }
 
         OutlinedTextField(
-            value = idText,
-            onValueChange = { idText = it },
+            value = uiState.userId,
+            onValueChange = { viewModel.updateUserId(it) },
             modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(brush = brush),
             label = { Text("아이디를 입력하세요") },
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = {
-                    focusRequester.requestFocus()
-                }
-            ),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(onNext = { focusRequester.requestFocus() }),
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(24.dp))
-
         Text(text = "PW", fontSize = 20.sp)
 
         OutlinedTextField(
-            value = pwText,
-            onValueChange = { pwText = it },
+            value = uiState.password,
+            onValueChange = { viewModel.updatePassword(it) },
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
@@ -118,21 +111,15 @@ fun LoginScreen(
             label = { Text("비밀번호를 입력해주세요.") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Go
-            ),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
             keyboardActions = KeyboardActions(
                 onGo = {
-                    // 로그인 검증 로직을 여기에 추가
-                    if (userPreferences.validateLogin(idText, pwText)) {
-                        onLoginClick(idText, pwText)
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "ID 또는 비밀번호가 일치하지 않습니다",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    viewModel.validateLogin(
+                        onSuccess = { id, pw -> onLoginClick(id, pw) },
+                        onFailure = { msg ->
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                        }
+                    )
                 }
             )
         )
@@ -141,16 +128,12 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                // 로그인 버튼 클릭 시 검증
-                if (userPreferences.validateLogin(idText, pwText)) {
-                    onLoginClick(idText, pwText)
-                } else {
-                    Toast.makeText(
-                        context,
-                        "ID 또는 비밀번호가 일치하지 않습니다",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                viewModel.validateLogin(
+                    onSuccess = { id, pw -> onLoginClick(id, pw) },
+                    onFailure = { msg ->
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                    }
+                )
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
@@ -168,11 +151,7 @@ fun LoginScreen(
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                "회원가입",
-                color = Color.Black,
-                textDecoration = TextDecoration.Underline
-            )
+            Text("회원가입", color = Color.Black, textDecoration = TextDecoration.Underline)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
