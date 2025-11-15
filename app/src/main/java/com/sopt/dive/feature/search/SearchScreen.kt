@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.sp
 /**
  * Search 탭 화면
  */
+
+// 예시 작업.
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier
