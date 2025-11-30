@@ -1,13 +1,16 @@
 package com.sopt.dive.feature.my
 
-
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -30,18 +33,12 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.GifDecoder
 
-/**
- * My 탭 화면
- * 1주차에서 만든 메인페이지를 여기로 옮겼습니다
- */
-
-// 메인 화면 컴포저블
-// 로그인한 사용자의 정보를 표시
 @Composable
 fun MyScreen(
     userId: String,
     userNickname: String,
-    userExtra: String,
+    userEmail: String,
+    userAge: Int,
     userPw: String,
     onNavigateToCard: () -> Unit,
     modifier: Modifier = Modifier,
@@ -51,7 +48,22 @@ fun MyScreen(
 
     // ViewModel에 유저 정보 전달
     LaunchedEffect(Unit) {
-        viewModel.setUserInfo(userId, userPw, userNickname, userExtra)
+        Log.d("MyScreen", "LaunchedEffect 시작 - userId: $userId")
+
+        // 로컬 정보 먼저 설정 (빠른 표시)
+        viewModel.setUserInfo(userId, userPw, userNickname, userEmail, userAge)
+        Log.d("MyScreen", "로컬 정보 설정 완료")
+
+        // 서버에서 최신 정보 가져오기 (userId를 Int로 변환)
+        val userIdInt = userId.toIntOrNull()
+        Log.d("MyScreen", "userId 변환 시도: $userId -> $userIdInt")
+
+        if (userIdInt != null) {
+            Log.d("MyScreen", "API 호출 시작: userId = $userIdInt")
+            viewModel.fetchUserFromServer(userIdInt)
+        } else {
+            Log.e("MyScreen", "userId를 Int로 변환 실패: $userId")
+        }
     }
 
     val context = LocalContext.current
@@ -76,6 +88,34 @@ fun MyScreen(
             fontWeight = FontWeight.Bold,
         )
 
+        // 로딩 상태 표시
+        if (uiState.isLoading) {
+            Text(
+                text = "📡 사용자 정보 불러오는 중...",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                textAlign = TextAlign.Center,
+                color = Color.Blue,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        // 에러 상태 표시
+        if (uiState.errorMessage != null) {
+            Text(
+                text = "⚠️ ${uiState.errorMessage}",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .background(Color.Red.copy(alpha = 0.1f))
+                    .padding(8.dp),
+                textAlign = TextAlign.Center,
+                color = Color.Red,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
         InfoBlock(label = "ID", value = uiState.userId)
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -85,26 +125,46 @@ fun MyScreen(
         InfoBlock(label = "NICKNAME", value = uiState.userNickname)
         Spacer(modifier = Modifier.height(24.dp))
 
-        InfoBlock(label = "승자는 ?", value = uiState.userExtra)
+        InfoBlock(label = "EMAIL", value = uiState.userEmail)
+        Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
-            onClick = { onNavigateToCard() },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Yellow,
-                contentColor = Color.Black
-            ),
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+        InfoBlock(label = "AGE", value = uiState.userAge.toString())
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // ✅ 버튼들을 가로로 배치
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,  // 균등 배치
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("GO to Card")
-        }
+            // 새로고침 버튼
+            Button(
+                onClick = {
+                    val userIdInt = userId.toIntOrNull()
+                    if (userIdInt != null) {
+                        viewModel.fetchUserFromServer(userIdInt)
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Blue,
+                    contentColor = Color.White
+                )
+            ) {
+                Text("새로고침")
+            }
 
-        AsyncImage(
-            model = "https://github.com/dmp100/dmp100/raw/main/gifs/gif1.gif",
-            contentDescription = "GIF",
-            imageLoader = imageLoader,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
+            // 카드 이동 버튼
+            Button(
+                onClick = { onNavigateToCard() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Yellow,
+                    contentColor = Color.Black
+                )
+            ) {
+                Text("GO to Card")
+            }
+        }
     }
 }
 
@@ -121,15 +181,15 @@ private fun InfoBlock(label: String, value: String) {
     }
 }
 
-// Preview 함수는 UI 확인용으로만 사용되므로 private으로 선언
 @Preview(showBackground = true, name = "Main Screen")
 @Composable
 private fun MainScreenPreview() {
     MyScreen(
         userId = "1234",
         userNickname = "555",
-        userExtra = "421412",
+        userEmail = "test@example.com",
+        userAge = 25,
         userPw = "4444",
-        onNavigateToCard = {} // 더미는 이렇게
+        onNavigateToCard = {}
     )
 }

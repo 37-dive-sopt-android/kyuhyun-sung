@@ -27,4 +27,13 @@ sealed interface HomeItem {
         val hasProfileMusic: Boolean
     ) : HomeItem
 
+    // 4. Reqres API에서 가져온 유저 프로필
+    data class UserProfile(
+        val id: Int,
+        val email: String,
+        val firstName: String,
+        val lastName: String,
+        val avatar: String
+    ) : HomeItem
+
 }

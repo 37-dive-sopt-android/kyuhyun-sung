@@ -9,13 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sopt.dive.feature.home.components.profile.BirthdayItemComponent
 import com.sopt.dive.feature.home.components.profile.FriendProfileComponent
 import com.sopt.dive.feature.home.components.profile.MyProfileComponent
+import com.sopt.dive.feature.home.components.profile.UserProfileComponent
 
 
 /**
@@ -49,6 +49,7 @@ fun HomeScreen(
                     is HomeItem.MyProfile -> "my_profile_${item.userId}"
                     is HomeItem.BirthdayItem -> "birthday_${item.name}"
                     is HomeItem.FriendProfile -> "friend_${item.name}"
+                    is HomeItem.UserProfile -> "user_${item.id}"
                 }
             }
         ) { item ->
@@ -69,17 +70,28 @@ fun HomeScreen(
                         hasMusic = item.hasProfileMusic
                     )
                 }
+                is HomeItem.UserProfile -> {
+                    UserProfileComponent(
+                        id = item.id,
+                        email = item.email,
+                        firstName = item.firstName,
+                        lastName = item.lastName,
+                        avatar = item.avatar
+                    )
+                }
             }
         }
     }
 }
 
-@Preview(showBackground = true, name = "뮤직 있음")
+@Preview(showBackground = true, name = "유저 프로필")
 @Composable
-private fun FriendProfileWithMusicPreview() {
-    FriendProfileComponent(
-        name = "ㅇㅇㅇㅇ",
-        statusMessage = "간바레",
-        hasMusic = true
+private fun UserProfilePreview() {
+    UserProfileComponent(
+        id = 1,
+        email = "george.bluth@reqres.in",
+        firstName = "George",
+        lastName = "Bluth",
+        avatar = "https://reqres.in/img/faces/1-image.jpg"
     )
 }

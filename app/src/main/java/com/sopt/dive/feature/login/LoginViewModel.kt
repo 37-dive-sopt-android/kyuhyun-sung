@@ -1,12 +1,19 @@
 package com.sopt.dive.feature.login
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sopt.dive.core.data.UserPreferences
+import com.sopt.dive.core.data.AuthPreferences  // ✅ UserPreferences → AuthPreferences
+import com.sopt.dive.core.data.datasource.ServicePool
+import com.sopt.dive.core.data.dto.RequestLoginDto
+import com.sopt.dive.core.data.dto.ResponseLoginDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class LoginViewModel(
     private val context: Context // ViewModelFactory를 따로 만들어서 DI 형태로 추후 리팩토링
@@ -15,7 +22,8 @@ class LoginViewModel(
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState
 
-    private val userPreferences = UserPreferences.getInstance(context)
+    private val authPreferences = AuthPreferences.getInstance(context)  //변경
+    private val authService = ServicePool.authService  // API Service 추가
 
     fun updateUserId(id: String) {
         _uiState.value = _uiState.value.copy(userId = id)
@@ -25,24 +33,81 @@ class LoginViewModel(
         _uiState.value = _uiState.value.copy(password = pw)
     }
 
-    fun validateLogin(onSuccess: (String, String) -> Unit, onFailure: (String) -> Unit) {
+    // 기존 validateLogin 제거 (UserPreferences 의존성 때문에)
+    // API 로그인만 사용하도록 변경
+
+    /**
+     * API 로그인 함수
+     * 서버에서 사용자 인증을 처리하고 성공 시 로그인 정보를 저장
+     */
+    fun loginWithApi(onSuccess: (String, String) -> Unit, onFailure: (String) -> Unit) {
         val id = _uiState.value.userId
         val pw = _uiState.value.password
 
-        viewModelScope.launch {
-            if (userPreferences.validateLogin(id, pw)) {
-                _uiState.value = _uiState.value.copy(
-                    loginSuccess = true,
-                    errorMessage = null
-                )
-                onSuccess(id, pw)
-            } else {
+        // 입력값 검증
+        if (id.isBlank() || pw.isBlank()) {
+            onFailure("ID와 비밀번호를 입력해주세요.")
+            return
+        }
+
+        _uiState.value = _uiState.value.copy(isLoading = true)
+
+        val request = RequestLoginDto(username = id, password = pw)
+
+        authService.login(request).enqueue(object : Callback<ResponseLoginDto> {
+            override fun onResponse(call: Call<ResponseLoginDto>, response: Response<ResponseLoginDto>) {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+
+                if (response.isSuccessful) {
+                    val loginData = response.body()
+                    if (loginData?.success == true) {
+                        // 실제 userId 저장
+                        val realUserId = loginData.data.userId  // 359
+                        Log.d("Login", "실제 userId: $realUserId")
+
+                        // AuthPreferences에 로그인 정보 저장
+                        authPreferences.saveLoginInfo(
+                            userId = realUserId,
+                            username = id,  // 입력한 username 저장
+                            password = pw   // 자동 로그인용 password 저장
+                        )
+
+                        _uiState.value = _uiState.value.copy(
+                            loginSuccess = true,
+                            errorMessage = null
+                        )
+
+                        onSuccess(realUserId.toString(), pw)  // 실제 userId 전달
+                    } else {
+                        onFailure(loginData?.message ?: "로그인 실패")
+                    }
+                } else {
+                    val errorMsg = when (response.code()) {
+                        401 -> "아이디 또는 비밀번호가 틀렸습니다"
+                        403 -> "비활성화된 사용자입니다"
+                        404 -> "존재하지 않는 사용자입니다"
+                        else -> "로그인 실패: ${response.message()}"
+                    }
+
+                    _uiState.value = _uiState.value.copy(
+                        loginSuccess = false,
+                        errorMessage = errorMsg
+                    )
+                    onFailure(errorMsg)
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseLoginDto>, t: Throwable) {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+                val errorMsg = "네트워크 오류: ${t.message}"
+                Log.e("Login", errorMsg)
+
                 _uiState.value = _uiState.value.copy(
                     loginSuccess = false,
-                    errorMessage = "ID 또는 비밀번호가 일치하지 않습니다."
+                    errorMessage = errorMsg
                 )
-                onFailure("ID 또는 비밀번호가 일치하지 않습니다.")
+                onFailure(errorMsg)
             }
-        }
+        })
     }
 }

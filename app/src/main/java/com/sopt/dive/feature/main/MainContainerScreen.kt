@@ -28,7 +28,7 @@ fun MainContainerScreen(
     mainRoute: NavigationRoute.MainContainer
 ) {
     // 바텀 네비게이션 탭 간 이동을 위한 별도의 NavController를 생성
-    // 이것은 앱 전체 네비게이션과는 독립적으로 동작하는 내부 네비게이션입
+    // 이것은 앱 전체 네비게이션과는 독립적으로 동작하는 내부 네비게이션입니다
     val bottomNavController = rememberNavController()
 
     Scaffold(
@@ -41,12 +41,12 @@ fun MainContainerScreen(
     ) { innerPadding ->
         NavHost(
             navController = bottomNavController,
-            startDestination = NavigationRoute.Home,  // 파라미터 제거
+            startDestination = NavigationRoute.Home,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<NavigationRoute.Home> {
                 HomeScreen(
-                    userId = mainRoute.userId,  // mainRoute에서 직접 전달
+                    userId = mainRoute.userId,
                     userNickname = mainRoute.userNickname
                 )
             }
@@ -57,27 +57,25 @@ fun MainContainerScreen(
 
             composable<NavigationRoute.My> {
                 MyScreen(
-                    userId = mainRoute.userId,  // mainRoute에서 직접 전달
+                    userId = mainRoute.userId,
                     userNickname = mainRoute.userNickname,
-                    userExtra = mainRoute.userExtra,
+                    userEmail = mainRoute.userEmail,    // userExtra → userEmail
+                    userAge = mainRoute.userAge,        // age 추가
                     userPw = mainRoute.userPw,
                     onNavigateToCard = {
-                        //  NavigationRoute.Card 사용
                         bottomNavController.navigate(NavigationRoute.Card)
                     }
                 )
             }
-            // 수정 (리뷰 댓글 반영)
+
             composable<NavigationRoute.Card> {
                 FlippingCardScreen(
                     onNavigateBack = { bottomNavController.popBackStack() }
                 )
             }
-
         }
     }
 }
-
 
 // Preview 함수는 UI 확인용으로만 사용되므로 private으로 선언
 @Preview(showBackground = true, name = "Main Container Screen")
@@ -87,7 +85,8 @@ private fun MainContainerScreenPreview() {
     val dummyMainRoute = NavigationRoute.MainContainer(
         userId = "previewUser",
         userNickname = "미리보기",
-        userExtra = "가위",
+        userEmail = "test@example.com",    // ✅ userExtra → userEmail
+        userAge = 25,                      // ✅ age 추가
         userPw = "preview123"
     )
 
